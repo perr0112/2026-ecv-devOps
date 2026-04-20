@@ -66,34 +66,58 @@ app.get('/equipes/:id', async (req, res) => {
 /**
  * Routes - {POST}
  */
-app.post('/equipes', (req, res) => {
-    equipes.push(req.body)
-    res.status(200).json(equipes)
+app.post('/equipes', async (req, res) => {
+    try {
+        const result = await db.collection('equipes').insertOne(req.body)
+        res.status(201).json(result)
+    } catch (err) {
+        console.error('Erreur MongoDB :', err)
+        res.status(500).json({ error: err.message })
+    }
 })
 
 /**
  * Routes - {PUT}
  */
-app.put('/equipes/:id', (req, res) => {
+app.put('/equipes/:id', async (req, res) => {
     const { name, country } = req.body
     const id = parseInt(req.params.id)
 
-    const equipe = equipes.find(equipe => equipe.id === id)
-    equipe.name = name
-    equipe.country = country
+    try {
+        const result = await db.collection('equipes').updateOne(
+            { id: id },
+            { $set: { name, country } }
+        )
 
-    res.status(200).json(equipe)
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: 'Équipe non trouvée' })
+        }
+
+        res.status(200).json(result)
+    } catch (err) {
+        console.error('Erreur MongoDB :', err)
+        res.status(500).json({ error: err.message })
+    }
 })
 
 /**
  * Routes - {DELETE}
  */
-app.delete('/equipes/:id', (req, res) => {
+app.delete('/equipes/:id', async (req, res) => {
     const id = parseInt(req.params.id)
-    const equipe = equipes.find(equipe => equipe.id === id)
-    equipes.splice(equipes.indexOf(equipe), 1)
 
-    res.status(200).json(equipes)
+    try {
+        const result = await db.collection('equipes').deleteOne({ id: id })
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Équipe non trouvée' })
+        }
+
+        res.status(200).json(result)
+    } catch (err) {
+        console.error('Erreur MongoDB :', err)
+        res.status(500).json({ error: err.message })
+    }
 })
 
 
