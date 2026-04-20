@@ -38,5 +38,5 @@ app.get("/produit/acheter", (req, res, next) => {
 
 // Listener
 app.listen(PORT, () => {
-    console.log(`Product-Service at 127.0.0.1:${PORT}`)
+    console.log(`Product-Service at http://127.0.0.1:${PORT}`)
 })
