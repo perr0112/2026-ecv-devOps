@@ -10,15 +10,9 @@ app.use(express.json())
 
 mongoose.set("strictQuery", true)
 
-mongoose.connect("mongodb://localhost/produit-service",
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    },
-    () => {
-        console.log(`Produit-Service DB Connected`)
-    },
-)
+mongoose.connect("mongodb://localhost/produit-service")
+  .then(() => console.log(`Produit-Service DB Connected`))
+  .catch((err) => console.error("DB connection error:", err));
 
 app.post("/produit/ajouter", (req, res, next) => {
     const { nom, description, prix } = req.body
