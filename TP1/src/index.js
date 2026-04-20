@@ -10,6 +10,11 @@ const PORT = 82
  */
 app.use(express.json())
 
+
+
+
+
+
 /**
  * Routes - {GET}
  */
@@ -46,6 +51,21 @@ app.put('/equipes/:id', (req, res) => {
 
     res.status(200).json(equipe)
 })
+
+/**
+ * Routes - {DELETE}
+ */
+app.delete('/equipes/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    const equipe = equipes.find(equipe => equipe.id === id)
+    equipes.splice(equipes.indexOf(equipe), 1)
+
+    res.status(200).json(equipes)
+})
+
+
+
+
 
 // Listener
 app.listen(PORT, () => {
