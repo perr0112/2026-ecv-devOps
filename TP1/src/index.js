@@ -46,11 +46,21 @@ app.get('/equipes', async (req, res) => {
     }
 })
 
-app.get('/equipes/:id', (req, res) => {
+app.get('/equipes/:id', async (req, res) => {
     const id = parseInt(req.params.id)
-    const equipe = equipes.find(equipe => equipe.id === id)
 
-    res.status(200).json(equipe)
+    try {
+        const equipe = await db.collection('equipes').findOne({ id: id })
+
+        if (!equipe) {
+            return res.status(404).json({ error: 'Équipe non trouvée' })
+        }
+
+        res.status(200).json(equipe)
+    } catch (err) {
+        console.error('Erreur MongoDB :', err)
+        res.status(500).json({ error: err.message })
+    }
 })
 
 /**
