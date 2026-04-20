@@ -1,10 +1,10 @@
 import express from "express"
+import mongoose from "mongoose"
+import { Produit } from "./Produits.js"
+
 const app = express()
 
 const PORT = process.env.PORT_ONE || 4000
-
-const mongoose = require("mongoose")
-const Produit = require("./Produit")
 
 app.use(express.json())
 
