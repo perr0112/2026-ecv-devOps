@@ -33,6 +33,20 @@ app.post('/equipes', (req, res) => {
     res.status(200).json(equipes)
 })
 
+/**
+ * Routes - {PUT}
+ */
+app.put('/equipes/:id', (req, res) => {
+    const { name, country } = req.body
+    const id = parseInt(req.params.id)
+
+    const equipe = equipes.find(equipe => equipe.id === id)
+    equipe.name = name
+    equipe.country = country
+
+    res.status(200).json(equipe)
+})
+
 // Listener
 app.listen(PORT, () => {
     console.log(`Application lancée sur le port ${PORT}`)
