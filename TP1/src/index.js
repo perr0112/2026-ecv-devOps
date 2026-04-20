@@ -137,6 +137,21 @@ app.get('/joueurs/:id', async (req, res) => {
     }
 })
 
+app.get('/joueurs/recherche/:nom', async (req, res) => {
+    const nom = req.params.nom
+
+    try {
+        const joueursTrouves = await db.collection('joueurs').find({
+            nom: { $regex: nom, $options: 'i' }
+        }).toArray()
+
+        res.status(200).json(joueursTrouves)
+    } catch (err) {
+        console.error('Erreur MongoDB :', err)
+        res.status(500).json({ error: err.message })
+    }
+})
+
 /**
  * Routes - {POST}
  */
