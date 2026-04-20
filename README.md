@@ -5,3 +5,4 @@ Ce projet contient tous les travaux pratiques réalisés dans le cadre du cours 
 ## Travaux pratiques
 
 - [TP1 - Création d'API Rest simples en node.js et express.js](./TP1/README.md)
+- [TP2 - Création de microservices](./TP2/README.md)
