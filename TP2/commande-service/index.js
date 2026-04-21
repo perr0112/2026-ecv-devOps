@@ -1,6 +1,9 @@
 import express from "express"
 import mongoose from "mongoose"
 import axios from "axios"
+
+import { isAuthenticated } from "./isAuthenticated.js"
+
 import { Commande } from "./Commande.js"
 
 const app = express()
@@ -16,11 +19,12 @@ function prixTotal(produits) {
     return produits.reduce((total, produit) => total + produit.prix, 0)
 }
 
-async function getProduits(ids) {
+async function getProduits(ids, token) {
     const url = `${PRODUIT_SERVICE_URL}/produit/acheter`
 
     const response = await axios.get(url, {
-        params: { ids: ids.join(",") }
+        params: { ids: ids.join(",") },
+        headers: { Authorization: `Bearer ${token}` }
     })
 
     return response.data
@@ -30,11 +34,12 @@ async function getProduits(ids) {
  * Routes - {POST}
  */
 
-app.post("/commande/ajouter", async (req, res) => {
+app.post("/commande/ajouter", isAuthenticated, async (req, res) => {
     const { ids, email_utilisateur } = req.body
+    const token = req.headers["authorization"].split(" ")[1]
 
     try {
-        const produits = await getProduits(ids)
+        const produits = await getProduits(ids, token)
 
         if (!produits || produits.length === 0) {
             return res.status(400).json({ error: "Aucun produit trouvé pour les ids fournis" })

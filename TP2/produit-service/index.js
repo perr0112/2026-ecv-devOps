@@ -1,5 +1,8 @@
 import express from "express"
 import mongoose from "mongoose"
+
+import { isAuthenticated } from "./isAuthenticated.js"
+
 import { Produit } from "./Produits.js"
 
 const app = express()
@@ -14,7 +17,7 @@ mongoose.connect("mongodb://localhost/produit-service")
   .then(() => console.log(`Produit-Service DB Connected`))
   .catch((err) => console.error("DB connection error:", err));
 
-app.post("/produit/ajouter", (req, res, next) => {
+app.post("/produit/ajouter", isAuthenticated, async (req, res, next) => {
     const { nom, description, prix } = req.body
     const newProduit = new Produit({
         nom,
@@ -28,7 +31,7 @@ app.post("/produit/ajouter", (req, res, next) => {
         .catch((error) => res.status(400).json({ error }))
 })
 
-app.get("/produit/acheter", async (req, res) => {
+app.get("/produit/acheter", isAuthenticated, async (req, res) => {
     const ids = req.query.ids
 
     if (!ids) {
