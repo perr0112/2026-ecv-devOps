@@ -6,6 +6,11 @@ import { isAuthenticated } from "./isAuthenticated.js"
 
 import { Commande } from "./Commande.js"
 
+import amqp from "amqplib"
+
+const AMQP_URL = process.env.AMQP_URL || "amqp://localhost:5672"
+let channel
+
 const app = express()
 
 const PORT = process.env.PORT_ONE || 4001
@@ -15,19 +20,39 @@ app.use(express.json())
 
 mongoose.set("strictQuery", true)
 
+async function connectAmqp() {
+    const connection = await amqp.connect(AMQP_URL)
+    channel = await connection.createChannel()
+    await channel.assertQueue("produit_commande")
+    await channel.assertQueue("produit_commande_reponse")
+    console.log("Commande-Service connecté à RabbitMQ")
+}
+
 function prixTotal(produits) {
     return produits.reduce((total, produit) => total + produit.prix, 0)
 }
 
-async function getProduits(ids, token) {
-    const url = `${PRODUIT_SERVICE_URL}/produit/acheter`
+async function getProduits(ids) {
+    return new Promise((resolve) => {
+        const correlationId = Date.now().toString()
 
-    const response = await axios.get(url, {
-        params: { ids: ids.join(",") },
-        headers: { Authorization: `Bearer ${token}` }
+        channel.consume("produit_commande_reponse", (msg) => {
+            const { correlationId: id, produits } = JSON.parse(msg.content.toString())
+
+            if (id === correlationId) {
+                console.log("Produits reçus via RabbitMQ --------", produits)
+                channel.ack(msg)
+                resolve(produits)
+            }
+        })
+
+        channel.sendToQueue(
+            "produit_commande",
+            Buffer.from(JSON.stringify({ ids, correlationId }))
+        )
+
+        console.log("Msg publié dans RabbitMQ -------- :", ids)
     })
-
-    return response.data
 }
 
 /**
@@ -62,8 +87,9 @@ app.post("/commande/ajouter", isAuthenticated, async (req, res) => {
 
 // Listener
 mongoose.connect("mongodb://localhost/commande-service")
-    .then(() => {
+    .then(async () => {
         console.log("Commande-Service DB Connected")
+        await connectAmqp()
         app.listen(PORT, () => console.log(`Commande-Service at http://127.0.0.1:${PORT}`))
     })
     .catch((err) => {
