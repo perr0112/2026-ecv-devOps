@@ -8,6 +8,7 @@ services:
     ports:
       - "27017:27017"
   produits:
+    image: perr0112/ecommerce-app:produits.v1
     build: ./produit-service
     container_name: produit-service
     ports:
@@ -17,6 +18,7 @@ services:
     depends_on:
       - db
   authentification:
+    image: perr0112/ecommerce-app:auth.v1
     build: ./auth-service
     container_name: auth-service
     ports:
@@ -26,6 +28,7 @@ services:
     depends_on:
       - db
   commande:
+    image: perr0112/ecommerce-app:commande.v1
     build: ./commande-service
     container_name: commande-service
     ports:
@@ -36,3 +39,11 @@ services:
       - authentification
       - produits
       - db
+  frontend:
+    image: perr0112/ecommerce-app:frontend.v1
+    build: ./frontend-service
+    container_name: frontend-service
+    ports:
+      - "8080:8080"
+    volumes:
+      - /app/node_modules
