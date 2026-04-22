@@ -72,7 +72,8 @@ app.post("/auth/login", async (req, res) => {
 
 
 // Listener
-mongoose.connect("mongodb://localhost/auth-service")
+// mongoose.connect("mongodb://localhost/auth-service")
+mongoose.connect("mongodb://db/auth-service")
     .then(() => {
         console.log("Auth-Service DB Connected")
         app.listen(PORT, () => console.log(`Auth-Service at http://127.0.0.1:${PORT}`))

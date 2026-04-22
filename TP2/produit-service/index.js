@@ -85,7 +85,8 @@ app.get("/produit/acheter", isAuthenticated, async (req, res) => {
 // app.listen(PORT, () => {
 //     console.log(`Product-Service at http://127.0.0.1:${PORT}`)
 // })
-mongoose.connect("mongodb://localhost/produit-service")
+// mongoose.connect("mongodb://localhost/produit-service")
+mongoose.connect("mongodb://db/produit-service")
     .then(() => {
         console.log("Produit-Service DB Connected")
         connectAmqp()

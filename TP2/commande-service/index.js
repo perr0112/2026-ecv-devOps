@@ -86,7 +86,7 @@ app.post("/commande/ajouter", isAuthenticated, async (req, res) => {
 
 
 // Listener
-mongoose.connect("mongodb://localhost/commande-service")
+mongoose.connect("mongodb://db/commande-service")
     .then(async () => {
         console.log("Commande-Service DB Connected")
         await connectAmqp()
